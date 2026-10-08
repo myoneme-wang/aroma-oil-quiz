@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>你的六支精油</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&display=swap">
+<style>
+/* Layout: single centered column, one question per screen, a cold→hot thermometer strip as the signature device */
+:root{
+  --bg:#eef2ef; --surface:#fbfcfb; --ink:#17302b; --muted:#5b6f69; --line:#cfd9d4;
+  --accent:#1f6b5c; --accent-ink:#ffffff; --chip:#e1ebe6;
+  --cold2:#2d6fa8; --cold1:#5d9cc4; --mild:#7f9a74; --warm1:#c98a3a; --hot2:#b64a2c;
+  --warn:#9a5b00; --warn-bg:#fbf0dc;
+  --f-display:"Noto Serif TC","Songti TC",serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1a18; --surface:#16231f; --ink:#e3ece8; --muted:#97aba4; --line:#2a3b36;
+  --accent:#5fb8a2; --accent-ink:#0f1a18; --chip:#1f302b;
+  --cold2:#6aa6d8; --cold1:#8cc0de; --mild:#9fb995; --warm1:#e0a65a; --hot2:#e0785a;
+  --warn:#f0b960; --warn-bg:#2c2416; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1a18; --surface:#16231f; --ink:#e3ece8; --muted:#97aba4; --line:#2a3b36;
+  --accent:#5fb8a2; --accent-ink:#0f1a18; --chip:#1f302b;
+  --cold2:#6aa6d8; --cold1:#8cc0de; --mild:#9fb995; --warm1:#e0a65a; --hot2:#e0785a;
+  --warn:#f0b960; --warn-bg:#2c2416; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.65;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:620px;margin:0 auto;display:grid;gap:20px}
+.thermo{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--cold2),var(--cold1),var(--mild),var(--warm1),var(--hot2))}
+header{display:grid;gap:6px}
+.eyebrow{font-size:12px;letter-spacing:.12em;color:var(--muted)}
+.trial{display:inline-block;font-size:12px;border:1px solid var(--line);border-radius:999px;padding:1px 10px;color:var(--muted);margin-left:6px;letter-spacing:.05em}
+h1{font-family:var(--f-display);font-size:30px;line-height:1.3;margin:0;text-wrap:balance}
+h2{font-family:var(--f-display);font-size:22px;line-height:1.4;margin:0;text-wrap:balance}
+p{margin:0}
+.lede{color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;display:grid;gap:16px}
+.axes{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;font-size:14px}
+.axes div{background:var(--chip);border-radius:8px;padding:8px 10px}
+.axes b{display:block;font-size:13px;color:var(--muted);font-weight:500}
+label.field{display:grid;gap:6px;font-weight:500}
+input[type=text]{font:inherit;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+input[type=text]:focus-visible,button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.consent{font-size:13px;color:var(--muted)}
+.progress{display:flex;gap:4px}
+.progress span{flex:1;height:4px;border-radius:2px;background:var(--line)}
+.progress span.on{background:var(--accent)}
+.qmeta{font-family:var(--f-mono);font-size:12px;color:var(--muted);letter-spacing:.06em}
+.hint{font-size:14px;color:var(--muted)}
+.sex{display:inline-block;font-size:12px;font-weight:500;border:1px solid var(--accent);color:var(--accent);border-radius:999px;padding:0 8px;margin-right:8px;vertical-align:1px}
+.opts{display:grid;gap:8px}
+.opt{font:inherit;text-align:left;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer;display:flex;gap:10px;align-items:flex-start;line-height:1.5}
+.opt:hover{border-color:var(--accent)}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--chip);font-weight:500}
+.opt .tick{flex:none;width:18px;height:18px;margin-top:3px;border-radius:50%;border:1.5px solid var(--muted)}
+.opt.multi .tick{border-radius:4px}
+.opt[aria-pressed="true"] .tick{background:var(--accent);border-color:var(--accent)}
+.opt.no[aria-pressed="true"]{border-color:var(--hot2)}
+.opt.no[aria-pressed="true"] .tick{background:var(--hot2);border-color:var(--hot2)}
+.fam-grid{display:grid;gap:8px}
+.fam-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.fam-row:last-child{border-bottom:0}
+.fam-row small{display:block;color:var(--muted);font-size:13px}
+.seg{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.seg button{font:inherit;font-size:13px;border:0;background:transparent;color:var(--muted);padding:6px 10px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.seg button.no[aria-pressed="true"]{background:var(--hot2);color:#fff}
+.nav{display:flex;gap:10px;justify-content:space-between}
+.btn{font:inherit;font-weight:500;border-radius:10px;padding:11px 18px;cursor:pointer;border:1.5px solid var(--accent);background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.rank{display:grid;gap:10px;list-style:none;margin:0;padding:0}
+.oil{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.oil .n{font-family:var(--f-display);font-size:26px;line-height:1;color:var(--accent);width:28px;text-align:center}
+.oil .top{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline}
+.oil .zh{font-weight:700;font-size:18px}
+.oil .la{font-family:var(--f-mono);font-style:italic;font-size:12px;color:var(--muted)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.tag{font-size:12px;border-radius:999px;padding:1px 9px;background:var(--chip);color:var(--ink)}
+.zone{color:#fff}
+.z-2{background:var(--cold2)}.z-1{background:var(--cold1)}.z0{background:var(--mild)}.z1{background:var(--warm1)}.z2{background:var(--hot2)}
+:root[data-theme="dark"] .zone{color:#0f1a18}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .zone{color:#0f1a18}}
+.why{font-size:14px;color:var(--muted);margin-top:6px}
+.bar{height:4px;border-radius:2px;background:var(--line);margin-top:8px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent)}
+.warnmark{font-size:12px;color:var(--warn);background:var(--warn-bg);border-radius:999px;padding:1px 8px}
+.blend{display:grid;gap:8px}
+.blend .mix{font-family:var(--f-display);font-size:20px}
+.steps{margin:0;padding-left:1.4em;display:grid;gap:6px}
+.usage{display:grid;gap:8px}
+.usage div{border-left:3px solid var(--accent);padding-left:10px}
+.note{font-size:13px;color:var(--muted);display:grid;gap:6px}
+.copybox{width:100%;min-height:140px;font-family:var(--f-mono);font-size:12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:10px}
+details{border-top:1px solid var(--line);padding-top:12px}
+summary{cursor:pointer;font-weight:500}
+.zonetable{display:grid;gap:10px;margin-top:12px}
+.zonetable .zr{display:grid;grid-template-columns:72px minmax(0,1fr);gap:10px;font-size:14px;align-items:start}
+.toast{font-size:13px;color:var(--accent);min-height:1.2em}
+@media (prefers-reduced-motion:no-preference){.card{animation:in .25s ease-out}@keyframes in{from{transform:translateY(6px)}to{transform:none}}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="thermo" aria-hidden="true"></div>
+  <header>
+    <p class="eyebrow">王偉全醫師｜芳香醫學選油評估<span class="trial">試用版 v0.1</span></p>
+    <h1>你的六支精油</h1>
+    <p class="lede">8 題、大約兩分鐘。從你的主訴、自律神經狀態、怕冷怕熱、氣味喜好，從 30 支精油裡排出最適合你的前六名。</p>
+  </header>
+  <main id="app"></main>
+</div>
+
+<script>
+/* ---------- data ---------- */
+// zone: sensory temperature on application (−2 強冷卻, −1 冷卻, 0 溫和, 0.5 微溫, 1 溫暖, 2 火熱)
+// ans: −2 strongly calming … +2 strongly activating
+// sym keys: mus 肌肉 / joi 關節 / hea 頭痛 / gut 腸胃 / res 呼吸 / sle 睡眠 / anx 焦慮 / fat 疲勞 / hor 荷爾蒙
+const OILS=[
+ {zh:"真正薰衣草",la:"Lavandula angustifolia",zone:0,fam:["floral","herbal"],ans:-2,damp:0,sym:{mus:2,joi:1,hea:2,gut:1,sle:3,anx:3,hor:1}},
+ {zh:"羅馬洋甘菊",la:"Chamaemelum nobile",zone:0,fam:["floral","herbal"],ans:-2,damp:0,sym:{mus:2,joi:1,hea:1,gut:2,sle:3,anx:3,hor:1},emo:"A"},
+ {zh:"德國洋甘菊",la:"Matricaria chamomilla",zone:-1,fam:["herbal"],ans:-1,damp:0,sym:{mus:1,joi:3,gut:1,sle:1,anx:1},warn:"菊科過敏者留意"},
+ {zh:"西洋蓍草",la:"Achillea millefolium",zone:-1,fam:["herbal"],ans:0,damp:0,sym:{mus:1,joi:3,gut:1,hor:2},warn:"菊科過敏、懷孕期留意"},
+ {zh:"胡椒薄荷",la:"Mentha × piperita",zone:-2,fam:["mint"],ans:2,damp:0,sym:{mus:1,joi:1,hea:3,gut:2,res:2,fat:3},warn:"高 menthol，刺激性強；幼兒臉部避免"},
+ {zh:"澳洲尤加利",la:"Eucalyptus radiata",zone:-1,fam:["mint"],ans:1,damp:1,sym:{mus:1,hea:1,res:3,fat:1},warn:"幼兒臉部避免"},
+ {zh:"檸檬",la:"Citrus limon",zone:-1,fam:["citrus"],ans:1,damp:2,sym:{gut:1,res:1,fat:2},warn:"冷壓檸檬有光敏性"},
+ {zh:"佛手柑",la:"Citrus bergamia",zone:0,fam:["citrus"],ans:-1,damp:0,sym:{gut:1,sle:2,anx:3,fat:1,hor:1},emo:"A",warn:"非 FCF 有光敏性"},
+ {zh:"苦橙葉",la:"Citrus aurantium (leaf)",zone:0,fam:["citrus","herbal"],ans:-2,damp:0,sym:{mus:1,gut:1,sle:2,anx:3},emo:"A"},
+ {zh:"甜橙",la:"Citrus sinensis",zone:0,fam:["citrus"],ans:1,damp:0,sym:{gut:2,sle:1,anx:2,fat:2}},
+ {zh:"卡氏乳香",la:"Boswellia carterii",zone:0,fam:["wood"],ans:-1,damp:0,sym:{mus:1,joi:2,res:2,sle:1,anx:2},emo:"B"},
+ {zh:"絲柏",la:"Cupressus sempervirens",zone:0,fam:["wood"],ans:0,damp:3,sym:{mus:1,res:2,hor:1}},
+ {zh:"玫瑰天竺葵",la:"Pelargonium graveolens",zone:0,fam:["floral"],ans:-1,damp:1,sym:{sle:1,anx:2,hor:3},emo:"C"},
+ {zh:"岩玫瑰",la:"Cistus ladanifer",zone:0,fam:["wood"],ans:-1,damp:0,sym:{joi:1,anx:2},emo:"C"},
+ {zh:"歐洲赤松",la:"Pinus sylvestris",zone:0,fam:["wood"],ans:1,damp:1,sym:{mus:1,res:3,fat:2,men:3}},
+ {zh:"紅檜",la:"Chamaecyparis formosensis",zone:0,fam:["wood"],ans:-1,damp:0,sym:{res:2,sle:2,anx:2},emo:"B"},
+ {zh:"大西洋雪松",la:"Cedrus atlantica",zone:0,fam:["wood"],ans:-1,damp:1,sym:{res:1,sle:2,anx:2,men:2},emo:"B"},
+ {zh:"岩蘭草",la:"Chrysopogon zizanioides",zone:0,fam:["wood"],ans:-2,damp:0,sym:{mus:1,sle:3,anx:3,men:1},emo:"B"},
+ {zh:"纈草",la:"Valeriana officinalis",zone:0,fam:["wood"],ans:-2,damp:0,sym:{mus:1,sle:3,anx:2}},
+ {zh:"永久花",la:"Helichrysum italicum",zone:0,fam:["herbal"],ans:0,damp:0,sym:{mus:2,joi:3},emo:"C"},
+ {zh:"貞節樹",la:"Vitex agnus-castus",zone:0,fam:["spice","herbal"],ans:0,damp:0,sym:{hor:3},warn:"懷孕、荷爾蒙敏感疾病、口服避孕藥或 dopamine 相關藥物留意"},
+ {zh:"廣藿香",la:"Pogostemon cablin",zone:0,fam:["wood"],ans:-1,damp:3,sym:{gut:2,sle:1,anx:2},emo:"B"},
+ {zh:"玫瑰草",la:"Cymbopogon martinii",zone:0,fam:["floral","herbal"],ans:-1,damp:0,sym:{sle:1,anx:2,hor:1},emo:"C"},
+ {zh:"檸檬香茅",la:"Cymbopogon citratus",zone:-1,fam:["citrus","herbal"],ans:1,damp:1,sym:{mus:2,joi:1,gut:1,fat:2},warn:"含 citral，可能刺激皮膚"},
+ {zh:"甜馬鬱蘭",la:"Origanum majorana",zone:0.5,fam:["herbal"],ans:-2,damp:0,sym:{mus:3,hea:2,gut:2,sle:2,anx:2,hor:2}},
+ {zh:"甜羅勒",la:"Ocimum basilicum",zone:0.5,fam:["herbal","spice"],ans:0,damp:0,sym:{mus:2,hea:1,gut:3,fat:1,hor:1},warn:"含 estragole"},
+ {zh:"桉油醇迷迭香",la:"Rosmarinus officinalis ct. 1,8-cineole",zone:1,fam:["herbal"],ans:2,damp:1,sym:{mus:2,hea:2,res:2,fat:3,men:2},warn:"癲癇病史留意"},
+ {zh:"杜松",la:"Juniperus communis",zone:1,fam:["wood"],ans:1,damp:3,sym:{mus:2,joi:2},warn:"懷孕、腎臟疾病留意"},
+ {zh:"黑胡椒",la:"Piper nigrum",zone:1,fam:["spice"],ans:1,damp:1,sym:{mus:3,joi:2,gut:1,fat:1,men:2},warn:"辛辣，刺激皮膚黏膜"},
+ {zh:"薑",la:"Zingiber officinale",zone:2,fam:["spice"],ans:1,damp:2,sym:{mus:2,joi:2,gut:3,fat:1,men:2},warn:"辛辣，刺激皮膚黏膜"},
+];
+const FAMS={citrus:["柑橘調","甜橙、檸檬、佛手柑"],floral:["花香調","薰衣草、天竺葵"],wood:["木質樹脂調","雪松、檜木、乳香"],herbal:["草本調","迷迭香、馬鬱蘭、洋甘菊"],spice:["辛香調","薑、黑胡椒"],mint:["清涼調","薄荷、尤加利"]};
+const SYM={mus:"肌肉痠痛、筋膜緊繃",joi:"關節不適、急性扭傷或發炎",hea:"頭痛",gut:"腸胃：壓力型脹氣、痙攣",res:"呼吸道：鼻塞、痰多、胸悶",sle:"睡不好",anx:"焦慮、心悸、壓力大",fat:"疲勞、提不起勁、腦霧",hor:"經前不適或更年期",men:"精力下降、男性更年期"};
+const SEX={hor:"女性回答",men:"男性回答"};
+const ZONE={"-2":["強冷卻","z-2"],"-1":["冷卻","z-1"],"0":["溫和","z0"],"0.5":["微溫","z1"],"1":["溫暖","z1"],"2":["火熱","z2"]};
+
+const QS=[
+ {id:"sym",type:"multi",max:2,title:"現在最想處理的是什麼？",hint:"最多選 2 項",opts:Object.entries(SYM).map(([v,t])=>({v,t:SEX[v]?`<span class="sex">${SEX[v]}</span>${t}`:t}))},
+ {id:"night",title:"晚上的你，比較接近哪一種？",opts:[{v:-1,t:"躺下來腦袋還停不下來，翻來覆去"},{v:1,t:"倒頭就睡，但睡再久也睡不飽"},{v:0,t:"都還好"}]},
+ {id:"day",title:"白天的你，比較常是？",opts:[{v:-1,t:"繃緊、容易煩躁，心跳偏快"},{v:1,t:"沉沉的、懶懶的，像沒電"},{v:0,t:"兩種輪流出現"},{v:0,t:"都還好",k:"ok"}]},
+ {id:"heat",title:"你比較怕冷，還是怕熱？",opts:[{v:-2,t:"很怕冷"},{v:-1,t:"有點怕冷"},{v:0,t:"都還好"},{v:1,t:"有點怕熱"},{v:2,t:"很怕熱"}]},
+ {id:"drink",title:"平常的飲料和手腳？",opts:[{v:-1,t:"喜歡熱飲，手腳常冰冷"},{v:0,t:"看情況，不一定"},{v:1,t:"喜歡冰飲，手腳常發熱或容易流汗"}]},
+ {id:"damp",title:"容易水腫、身體沉重，或下午腿腫嗎？",opts:[{v:2,t:"常常"},{v:1,t:"偶爾"},{v:0,t:"很少"}]},
+ {id:"fam",type:"fam",title:"這些氣味，你喜歡哪些？",hint:"不喜歡、或會勾起不好回憶的，請選「不要」，那一類會直接排除"},
+ {id:"emo",title:"最近讓你最沉重的，比較像哪一種？",hint:"這題用的是傳統芳療的情緒對應，只在名次接近時參考",opts:[{v:"A",t:"放不下、想把每件事都做好，很難放鬆"},{v:"B",t:"不安、沒有安全感，好像沒有地方可以靠"},{v:"C",t:"一段失落或傷心的事，一直過不去"},{v:"",t:"沒有特別"}]},
+];
+
+/* ---------- scoring (pure) ---------- */
+function score(a){
+  const s=(a.night??0)+(a.day??0);           // −2 hyper … +2 low
+  const H=(a.heat??0)+(a.drink??0);          // −3 cold … +3 hot
+  const d=a.damp??0;
+  const syms=a.sym||[];
+  const fam=a.fam||{};
+  const out=[];
+  for(const o of OILS){
+    if(fam[o.fam[0]]==="no") continue;        // disliked primary family → excluded
+    const parts=[];
+    for(const k of syms){const v=(o.sym[k]||0)*3; if(v) parts.push([v,"對應你的主訴「"+SYM[k].split("：")[0].split("、")[0]+"」"]);}
+    const t=-H*o.zone*3;
+    if(t) parts.push([t, H<0?(o.zone>0?"你偏怕冷，它擦起來偏暖":"你偏怕冷，它偏涼，扣分"):(o.zone<0?"你偏怕熱，它擦起來偏涼":"你偏怕熱，它偏暖，扣分")]);
+    const n=2*s*o.ans;
+    if(n) parts.push([n, s<0?(o.ans<0?"你偏緊繃停不下來，它偏安撫":"你已經很緊繃，它偏提振，扣分"):(o.ans>0?"你偏低電量，它偏提振":"你已經沒電，它偏鎮靜，扣分")]);
+    const w=d*o.damp*1.5;
+    if(w) parts.push([w,"你容易水腫沉重，它常用於排濕"]);
+    o.fam.forEach((f,i)=>{ if(fam[f]==="like") parts.push([i?2:4,"你喜歡"+FAMS[f][0]]); if(i&&fam[f]==="no") parts.push([-4,"含你不喜歡的"+FAMS[f][0]]); });
+    if(a.emo&&o.emo===a.emo) parts.push([2,"傳統芳療的情緒對應"]);
+    const total=parts.reduce((x,p)=>x+p[0],0);
+    const symSum=syms.reduce((x,k)=>x+(o.sym[k]||0),0);
+    out.push({o,total,parts,symSum});
+  }
+  out.sort((x,y)=>y.total-x.total||y.symSum-x.symSum);
+  return out;
+}
+
+/* ---------- state & render ---------- */
+const st={step:-1,name:"",a:{fam:{}}};
+const app=document.getElementById("app");
+const el=(h)=>{const t=document.createElement("template");t.innerHTML=h.trim();return t.content.firstElementChild};
+const esc=(s)=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function render(){
+  app.innerHTML="";
+  if(st.step<0) return renderIntro();
+  if(st.step>=QS.length) return renderResult();
+  renderQ(QS[st.step]);
+}
+function renderIntro(){
+  const c=el(`<section class="card">
+    <div class="axes">
+      <div><b>主訴</b>想處理什麼</div><div><b>自律神經</b>繃緊或沒電</div>
+      <div><b>寒熱</b>怕冷或怕熱</div><div><b>濕</b>水腫沉重</div>
+      <div><b>氣味</b>喜歡與排斥</div><div><b>情緒</b>傳統芳療參考</div>
+    </div>
+    <label class="field" for="nm">你的名字或暱稱<input type="text" id="nm" autocomplete="nickname" placeholder="例如：小安" value="${esc(st.name)}"></label>
+    <p class="consent">作答內容僅供王醫師為你調配精油使用。結果頁可以一鍵複製，傳給王醫師。</p>
+    <div class="nav"><span></span><button class="btn" id="go">開始</button></div>
+  </section>`);
+  app.append(c);
+  const nm=c.querySelector("#nm"),go=c.querySelector("#go");
+  const upd=()=>{st.name=nm.value.trim();go.disabled=!st.name};
+  nm.addEventListener("input",upd);upd();
+  go.onclick=()=>{st.step=0;render();window.scrollTo(0,0)};
+}
+function progress(){return `<div class="progress" aria-hidden="true">${QS.map((_,i)=>`<span class="${i<=st.step?"on":""}"></span>`).join("")}</div>`}
+function answered(q){const v=st.a[q.id]; if(q.type==="multi") return (v||[]).length>0; if(q.type==="fam") return true; return v!==undefined}
+function renderQ(q){
+  const c=el(`<section class="card">${progress()}
+    <p class="qmeta">QUESTION ${st.step+1} / ${QS.length}</p>
+    <h2>${q.title}</h2>${q.hint?`<p class="hint">${q.hint}</p>`:""}
+    <div class="body"></div>
+    <div class="nav"><button class="btn ghost" id="back">上一題</button><button class="btn" id="next">${st.step===QS.length-1?"看結果":"下一題"}</button></div>
+  </section>`);
+  const body=c.querySelector(".body");
+  if(q.type==="fam"){
+    const g=el(`<div class="fam-grid"></div>`);
+    for(const [k,[name,ex]] of Object.entries(FAMS)){
+      const cur=st.a.fam[k]||"ok";
+      const r=el(`<div class="fam-row"><div>${name}<small>${ex}</small></div>
+        <div class="seg" role="group" aria-label="${name}">
+          <button data-v="like" aria-pressed="${cur==="like"}">喜歡</button>
+          <button data-v="ok" aria-pressed="${cur==="ok"}">普通</button>
+          <button data-v="no" class="no" aria-pressed="${cur==="no"}">不要</button></div></div>`);
+      r.querySelectorAll("button").forEach(b=>b.onclick=()=>{st.a.fam[k]=b.dataset.v;r.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b))});
+      g.append(r);
+    }
+    body.append(g);
+  }else{
+    const box=el(`<div class="opts"></div>`);
+    q.opts.forEach((o,i)=>{
+      const multi=q.type==="multi";
+      const key=o.k||String(o.v);
+      const sel=multi?(st.a.sym||[]).includes(o.v):(st.a[q.id+"_k"]===key);
+      const b=el(`<button class="opt${multi?" multi":""}" aria-pressed="${sel}"><span class="tick"></span><span>${o.t}</span></button>`);
+      b.onclick=()=>{
+        if(multi){let arr=st.a.sym||[];arr=arr.includes(o.v)?arr.filter(x=>x!==o.v):[...arr,o.v];if(arr.length>q.max)arr=arr.slice(-q.max);st.a.sym=arr;}
+        else{st.a[q.id]=o.v;st.a[q.id+"_k"]=key;}
+        render();
+      };
+      box.append(b);
+    });
+    body.append(box);
+  }
+  app.append(c);
+  const next=c.querySelector("#next");next.disabled=!answered(q);
+  next.onclick=()=>{st.step++;render();window.scrollTo(0,0)};
+  c.querySelector("#back").onclick=()=>{st.step--;render();window.scrollTo(0,0)};
+}
+function optText(id){const q=QS.find(x=>x.id===id);const k=st.a[id+"_k"];const o=q.opts.find(o=>(o.k||String(o.v))===k);return o?o.t:"—"}
+function renderResult(){
+  const ranked=score(st.a);
+  const top=ranked.slice(0,6);
+  const max=Math.max(1,top[0]?top[0].total:1);
+  const syms=st.a.sym||[];
+  const msk=syms.some(k=>["mus","joi","hea"].includes(k));
+  const mix=top.slice(0,3).map(r=>r.o.zh);
+  const USE={gut:"腸胃：調成按摩油，在腹部順時針輕柔按摩。",res:"呼吸道：擴香或蒸氣吸入。",sle:"睡不好：睡前吸聞，或滴入浴鹽泡澡。",anx:"焦慮、壓力：隨身吸聞，感覺緊繃時深呼吸幾次。",fat:"疲勞、腦霧：早上或午後吸聞。",hor:"經前或更年期：調成按摩油，按摩下腹部與下背。",men:"精力下降：早上吸聞，或調成按摩油按摩下背與腰部。"};
+  const cards=syms.filter(k=>USE[k]).map(k=>`<div>${USE[k]}</div>`).join("");
+  const warns=top.filter(r=>r.o.warn);
+  const c=el(`<section class="card">
+    <p class="qmeta">RESULT · ${esc(st.name)}</p>
+    <h2>${esc(st.name)}，這是你的前六名</h2>
+    <p class="hint">六支裡，聞起來最喜歡的那支優先用。</p>
+    <ol class="rank">${top.map((r,i)=>{
+      const z=ZONE[String(r.o.zone)];
+      const why=r.parts.filter(p=>p[0]>0).sort((x,y)=>y[0]-x[0]).slice(0,3).map(p=>p[1]).join("；");
+      return `<li class="oil"><div class="n">${i+1}</div><div>
+        <div class="top"><span class="zh">${r.o.zh}</span><span class="la">${r.o.la}</span>${r.o.warn?'<span class="warnmark">⚠️ 見註解</span>':""}</div>
+        <div class="tags"><span class="tag zone ${z[1]}">${z[0]}</span>${r.o.fam.map(f=>`<span class="tag">${FAMS[f][0]}</span>`).join("")}</div>
+        <p class="why">${why||"綜合分數"}</p>
+        <div class="bar"><i style="width:${Math.max(4,Math.round(r.total/max*100))}%"></i></div></div></li>`}).join("")}</ol>
+  </section>`);
+  const blend=el(`<section class="card blend">
+    <p class="qmeta">SUGGESTED BLEND</p>
+    <p class="mix">${mix.join(" ＋ ")}</p>
+    ${msk?`<p class="hint">用在肌肉、關節或頭痛時，照這個順序：</p>
+    <ol class="steps"><li>按摩：把配方調成按摩油，先放鬆最緊的部位。</li><li>伸展：趁肌肉放鬆時伸展。</li><li>啟動運動：做一個簡單的肌力或穩定動作。</li><li>修復：運動後再塗一次。</li><li>吸聞：最後深呼吸吸聞，讓身體從緊繃切換到放鬆。</li></ol>`:""}
+    ${cards?`<div class="usage">${cards}</div>`:""}
+  </section>`);
+  const summary=buildText(top,mix);
+  const share=el(`<section class="card">
+    <p class="qmeta">SEND TO DR. WANG</p>
+    <p>按下按鈕複製結果，貼到 LINE 傳給王醫師。</p>
+    <div class="nav"><button class="btn" id="cp">複製結果</button><button class="btn ghost" id="redo">重新作答</button></div>
+    <p class="toast" id="toast" role="status"></p>
+    <textarea class="copybox" id="txt" readonly hidden>${esc(summary)}</textarea>
+  </section>`);
+  const notes=el(`<section class="card note">
+    <p class="qmeta">NOTES</p>
+    ${warns.length?`<p><b>⚠️ 標記的精油：</b>${warns.map(r=>r.o.zh+"："+r.o.warn).join("；")}。</p>`:""}
+    <p>這份結果是依你的作答排出的參考名單，不是診斷。實際使用的精油、濃度與方式，請由王醫師確認。</p>
+    <p>懷孕或哺乳、癲癇、氣喘、幼兒、正在服用 anticoagulant 或其他長期藥物、皮膚敏感者，使用前請先告訴醫師。</p>
+    <p>情緒那一題用的是傳統芳療的對應，不是藥理實證。⚠️ 註記為初稿，待查證。</p>
+    <details><summary>30 支精油的寒熱分區（醫師檢視用）</summary>
+      <div class="zonetable">${["-2","-1","0","0.5","1","2"].map(z=>`<div class="zr"><span class="tag zone ${ZONE[z][1]}">${ZONE[z][0]}</span><span>${OILS.filter(o=>String(o.zone)===z).map(o=>o.zh).join("、")}</span></div>`).join("")}</div>
+    </details>
+  </section>`);
+  app.append(c,blend,share,notes);
+  share.querySelector("#redo").onclick=()=>{st.step=-1;st.a={fam:{}};render();window.scrollTo(0,0)};
+  share.querySelector("#cp").onclick=async()=>{
+    const t=share.querySelector("#toast"),ta=share.querySelector("#txt");
+    try{await navigator.clipboard.writeText(summary);t.textContent="已複製，可以貼到 LINE 了。";}
+    catch(e){ta.hidden=false;ta.focus();ta.select();t.textContent="無法自動複製，請長按下方文字全選後複製。";}
+  };
+}
+function buildText(top,mix){
+  const f=st.a.fam,fl=k=>Object.keys(FAMS).filter(x=>f[x]===k).map(x=>FAMS[x][0]).join("、")||"無";
+  return [
+    "【芳香選油評估 v0.1】"+st.name+"｜"+new Date().toLocaleDateString("zh-TW"),
+    "主訴："+((st.a.sym||[]).map(k=>SYM[k]).join("／")||"—"),
+    "晚上："+optText("night"),"白天："+optText("day"),
+    "寒熱："+optText("heat")+"；"+optText("drink"),
+    "水腫沉重："+optText("damp"),
+    "喜歡："+fl("like")+"；排除："+fl("no"),
+    "情緒："+optText("emo"),
+    "前六名："+top.map((r,i)=>(i+1)+"."+r.o.zh+"("+Math.round(r.total)+")").join(" "),
+    "建議配方："+mix.join("＋")
+  ].join("\n");
+}
+render();
+
+</script>
+</body>
+</html>
