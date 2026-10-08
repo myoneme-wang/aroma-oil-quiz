@@ -159,7 +159,7 @@ const OILS=[
 const FAMS={citrus:["柑橘調","甜橙、檸檬、佛手柑"],floral:["花香調","薰衣草、天竺葵"],wood:["木質樹脂調","雪松、檜木、乳香"],herbal:["草本調","迷迭香、馬鬱蘭、洋甘菊"],spice:["辛香調","薑、黑胡椒"],mint:["清涼調","薄荷、尤加利"]};
 const SYM={mus:"肌肉痠痛、筋膜緊繃",joi:"關節不適、急性扭傷或發炎",hea:"頭痛",gut:"腸胃：壓力型脹氣、痙攣",res:"呼吸道：鼻塞、痰多、胸悶",sle:"睡不好",anx:"焦慮、心悸、壓力大",fat:"疲勞、提不起勁、腦霧",hor:"經前不適或更年期",men:"精力下降、男性更年期"};
 const SEX={hor:"女性回答",men:"男性回答"};
-const DROPS=[4,3,3];
+const DROPS=[4,3,2,2];
 const ZONE={"-2":["強冷卻","z-2"],"-1":["冷卻","z-1"],"0":["溫和","z0"],"0.5":["微溫","z1"],"1":["溫暖","z1"],"2":["火熱","z2"]};
 
 const QS=[
@@ -281,7 +281,7 @@ function renderResult(){
   const max=Math.max(1,top[0]?top[0].total:1);
   const syms=st.a.sym||[];
   const msk=syms.some(k=>["mus","joi","hea"].includes(k));
-  const mix=top.slice(0,3).map(r=>r.o.zh);
+  const mix=top.slice(0,4).map(r=>r.o.zh);
   const USE={gut:"腸胃：調成按摩油，在腹部順時針輕柔按摩。",res:"呼吸道：擴香或蒸氣吸入。",sle:"睡不好：睡前吸聞，或滴入浴鹽泡澡。",anx:"焦慮、壓力：隨身吸聞，感覺緊繃時深呼吸幾次。",fat:"疲勞、腦霧：早上或午後吸聞。",hor:"經前或更年期：調成按摩油，按摩下腹部與下背。",men:"精力下降：早上吸聞，或調成按摩油按摩下背與腰部。"};
   const cards=syms.filter(k=>USE[k]).map(k=>`<div>${USE[k]}</div>`).join("");
   const warns=top.filter(r=>r.o.warn);
@@ -301,7 +301,7 @@ function renderResult(){
   const blend=el(`<section class="card blend">
     <p class="qmeta">SUGGESTED BLEND</p>
     <p class="mix">${mix.join(" ＋ ")}</p>
-    <div class="recipe"><p><b>10 cc 按摩油（5%）</b></p><p>荷荷芭油 10 cc ＋ 精油共約 10 滴：${mix.map((m,i)=>m+" "+DROPS[i]+" 滴").join("、")}</p><p class="hint">以 1 cc 約 20 滴估算，依滴管略有差異。</p></div>
+    <div class="recipe"><p><b>10 cc 按摩油（5%）</b></p><p>荷荷芭油 10 cc ＋ 精油共 ${DROPS.reduce((a,b)=>a+b,0)} 滴：${mix.map((m,i)=>m+" "+DROPS[i]+" 滴").join("、")}</p><p class="hint">以 1 cc 約 20 滴估算，依滴管略有差異。</p></div>
     ${msk?`<p class="hint">用在肌肉、關節或頭痛時，照這個順序：</p>
     <ol class="steps"><li>按摩：把配方調成按摩油，先放鬆最緊的部位。</li><li>伸展：趁肌肉放鬆時伸展。</li><li>啟動運動：做一個簡單的肌力或穩定動作。</li><li>修復：運動後再塗一次。</li><li>吸聞：最後深呼吸吸聞，讓身體從緊繃切換到放鬆。</li></ol>`:""}
     ${cards?`<div class="usage">${cards}</div>`:""}
