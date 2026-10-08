@@ -93,6 +93,7 @@ input[type=text]:focus-visible,button:focus-visible{outline:3px solid var(--acce
 .warnmark{font-size:12px;color:var(--warn);background:var(--warn-bg);border-radius:999px;padding:1px 8px}
 .blend{display:grid;gap:8px}
 .blend .mix{font-family:var(--f-display);font-size:20px}
+.recipe{display:grid;gap:4px;background:var(--chip);border-radius:10px;padding:12px 14px}
 .steps{margin:0;padding-left:1.4em;display:grid;gap:6px}
 .usage{display:grid;gap:8px}
 .usage div{border-left:3px solid var(--accent);padding-left:10px}
@@ -142,7 +143,7 @@ const OILS=[
  {zh:"紅檜",la:"Chamaecyparis formosensis",zone:0,fam:["wood"],ans:-1,damp:0,sym:{res:2,sle:2,anx:2},emo:"B"},
  {zh:"大西洋雪松",la:"Cedrus atlantica",zone:0,fam:["wood"],ans:-1,damp:1,sym:{res:1,sle:2,anx:2,men:2},emo:"B"},
  {zh:"岩蘭草",la:"Chrysopogon zizanioides",zone:0,fam:["wood"],ans:-2,damp:0,sym:{mus:1,sle:3,anx:3,men:1},emo:"B"},
- {zh:"纈草",la:"Valeriana officinalis",zone:0,fam:["wood"],ans:-2,damp:0,sym:{mus:1,sle:3,anx:2}},
+ {zh:"纈草",la:"Valeriana officinalis",zone:0,fam:["wood"],ans:-2,damp:0,sym:{mus:1,sle:3,anx:2},warn:"氣味特殊，建議先試聞再使用"},
  {zh:"永久花",la:"Helichrysum italicum",zone:0,fam:["herbal"],ans:0,damp:0,sym:{mus:2,joi:3},emo:"C"},
  {zh:"貞節樹",la:"Vitex agnus-castus",zone:0,fam:["spice","herbal"],ans:0,damp:0,sym:{hor:3},warn:"懷孕、荷爾蒙敏感疾病、口服避孕藥或 dopamine 相關藥物留意"},
  {zh:"廣藿香",la:"Pogostemon cablin",zone:0,fam:["wood"],ans:-1,damp:3,sym:{gut:2,sle:1,anx:2},emo:"B"},
@@ -158,6 +159,7 @@ const OILS=[
 const FAMS={citrus:["柑橘調","甜橙、檸檬、佛手柑"],floral:["花香調","薰衣草、天竺葵"],wood:["木質樹脂調","雪松、檜木、乳香"],herbal:["草本調","迷迭香、馬鬱蘭、洋甘菊"],spice:["辛香調","薑、黑胡椒"],mint:["清涼調","薄荷、尤加利"]};
 const SYM={mus:"肌肉痠痛、筋膜緊繃",joi:"關節不適、急性扭傷或發炎",hea:"頭痛",gut:"腸胃：壓力型脹氣、痙攣",res:"呼吸道：鼻塞、痰多、胸悶",sle:"睡不好",anx:"焦慮、心悸、壓力大",fat:"疲勞、提不起勁、腦霧",hor:"經前不適或更年期",men:"精力下降、男性更年期"};
 const SEX={hor:"女性回答",men:"男性回答"};
+const DROPS=[4,3,3];
 const ZONE={"-2":["強冷卻","z-2"],"-1":["冷卻","z-1"],"0":["溫和","z0"],"0.5":["微溫","z1"],"1":["溫暖","z1"],"2":["火熱","z2"]};
 
 const QS=[
@@ -299,6 +301,7 @@ function renderResult(){
   const blend=el(`<section class="card blend">
     <p class="qmeta">SUGGESTED BLEND</p>
     <p class="mix">${mix.join(" ＋ ")}</p>
+    <div class="recipe"><p><b>10 cc 按摩油（5%）</b></p><p>荷荷芭油 10 cc ＋ 精油共約 10 滴：${mix.map((m,i)=>m+" "+DROPS[i]+" 滴").join("、")}</p><p class="hint">以 1 cc 約 20 滴估算，依滴管略有差異。</p></div>
     ${msk?`<p class="hint">用在肌肉、關節或頭痛時，照這個順序：</p>
     <ol class="steps"><li>按摩：把配方調成按摩油，先放鬆最緊的部位。</li><li>伸展：趁肌肉放鬆時伸展。</li><li>啟動運動：做一個簡單的肌力或穩定動作。</li><li>修復：運動後再塗一次。</li><li>吸聞：最後深呼吸吸聞，讓身體從緊繃切換到放鬆。</li></ol>`:""}
     ${cards?`<div class="usage">${cards}</div>`:""}
@@ -340,7 +343,8 @@ function buildText(top,mix){
     "喜歡："+fl("like")+"；排除："+fl("no"),
     "情緒："+optText("emo"),
     "前六名："+top.map((r,i)=>(i+1)+"."+r.o.zh+"("+Math.round(r.total)+")").join(" "),
-    "建議配方："+mix.join("＋")
+    "建議配方："+mix.join("＋"),
+    "10cc 按摩油(5%)：荷荷芭油10cc＋"+mix.map((m,i)=>m+DROPS[i]+"滴").join("、")
   ].join("\n");
 }
 render();
